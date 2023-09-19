@@ -61,6 +61,8 @@ bool PlayersMove(std::vector<int>& field, int& allchips, const int player)
         std::cout << "First Player Move (row, chips): ";
     else if (player == PlayerTwo)
         std::cout << "Second Player Move (row, chips):  ";
+    else
+        std::cout << "No Player???";
 
     InputMove(row, chips);
     if (row > field.size() || row <= 0)
@@ -88,28 +90,18 @@ void GameManager(std::vector<int> field)
 {
     int allchips = SumChipsInField(field);
     int Winner = -1;
+    int player = PlayerTwo;
     while (true)
     {
         bool isError = false;
-
+        player == PlayerOne ? player = PlayerTwo : player = PlayerOne;
         do{
-            isError = PlayersMove(field, allchips, PlayerOne);
+            isError = PlayersMove(field, allchips, player);
         } while (isError);
 
         if (allchips <= 0)
         {
-            Winner = PlayerOne;
-            break;
-        }
-        PrintField(field);
-
-        do{
-            isError = PlayersMove(field, allchips, PlayerTwo);
-        } while (isError);
-
-        if (allchips <= 0)
-        {
-            Winner = PlayerTwo;
+            Winner = player;
             break;
         }
     }
