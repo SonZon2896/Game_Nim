@@ -9,6 +9,10 @@ enum{
     PlayerTwo
 };
 
+static std::vector<int> prevfield;
+static std::vector<int> field;
+static bool GameWithBot;
+
 void ClearConsole()
 {
     system("cls");
@@ -32,21 +36,7 @@ void InputMove(int& row, int& chips)
     Input(chips);
 }
 
-void PrintField(const std::vector<int> field)
-{
-    ClearConsole();
-    for (int i = 0; i < field.size(); i++)
-    {
-        std::cout << i + 1 << ' ';
-        for (int j = 0; j < field[i]; j++)
-        {
-            std::cout << '*';
-        }
-        std::cout << std::endl;
-    }
-}
-
-int SumChipsInField(const std::vector<int> field)
+int SumChipsInField()
 {
     int sum = 0;
     for (int i: field)
@@ -54,17 +44,80 @@ int SumChipsInField(const std::vector<int> field)
     return sum;
 }
 
+void PrintField()
+{
+    ClearConsole();
+    for (int i = 0; i < field.size(); i++)
+    {
+        std::cout << i + 1 << ' ';
+        if (GameWithBot)
+            for (int j = 0; j < prevfield[i]; j++)
+            {
+                if (j < field[i])
+                    std::cout << '*';
+                else
+                    std::cout << '$';
+            }
+        else
+            for (int j = 0; j < field[i]; j++)
+            {
+                std::cout << '*';
+            }
+        std::cout << std::endl;
+    }
+    //std::cout << SumChipsInField() << std::endl;
+}
+
 /// @brief make field by rows
 /// @param rows variable in Menu()
 /// @return 
 std::vector<int> MakeField(int rows)
 {
-    std::vector<int> field(rows);
+    std::vector<int> tempfield(rows);
     for (int i = 0; i < rows; i++)
     {
-        field[i] = 3 + i;
+        tempfield[i] = 3 + i;
     }
-    return field;
+    prevfield = tempfield;
+    return tempfield;
+}
+
+int NimSum(std::vector<int> Field = field)
+{
+    int nimSum = 0;
+    for (auto i: Field)
+        nimSum ^= i;
+    return nimSum;
+}
+
+/// @brief bot
+/// @param field 
+/// @return row, chips
+std::vector<int> botMove()
+{
+    if (NimSum() == 0)
+    {
+        for (int i = 0; i < field.size(); i++)
+        {
+            if (field[i] > 2)
+                return {i + 1, field[i] - 2};
+            else if (field[i] != 0)
+                return {i + 1, 1};
+        }
+    }
+    std::vector<int> Move(2);
+    std::vector<int> tempField = field;
+    for (int i = 0; i < field.size(); i++)
+    {
+        for (int j = 0; j < field[i] + 1; j++)
+        {
+            tempField[i] -= j;
+            if (NimSum(tempField) == 0)
+                return {i + 1, j};
+            tempField[i] += j;
+        }
+    }
+    return {-1, -1};
 }
 
 /// @brief 
@@ -72,23 +125,33 @@ std::vector<int> MakeField(int rows)
 /// @param allchips all chips in field
 /// @param player which player is moving
 /// @return return error(if player input error) - true, if not error - false
-bool PlayersMove(std::vector<int>& field, int& allchips, const int player)
+bool PlayersMove(int& allchips, const int player)
 {
-    int row, chips;
-    PrintField(field);
+    PrintField();
     if (player == PlayerOne)
         std::cout << "First Player Move (row, chips): ";
     else if (player == PlayerTwo)
         std::cout << "Second Player Move (row, chips):  ";
     else
         std::cout << "No Player???";
-
-    InputMove(row, chips);
+    
+    int row, chips;
+    if (GameWithBot && player == PlayerTwo)
+    {
+        std::vector<int> BotMove = botMove();
+        row = BotMove[0];
+        chips = BotMove[1];
+        std::cout << row << ' ' << chips << std::endl;
+    }
+    else
+        InputMove(row, chips);
+    
     if (row > field.size() || row <= 0)
         return true;
     if (chips > field[--row] || chips <= 0)
         return true;
 
+    prevfield = field;
     field[row] -= chips;
     allchips -= chips;
     return false;
@@ -107,9 +170,9 @@ void PrintWinner(const int Winner)
 
 /// @brief main game colculation
 /// @param field 
-void GameManager(std::vector<int> field)
+void GameManager()
 {
-    int allchips = SumChipsInField(field);
+    int allchips = SumChipsInField();
     int Winner = -1;
     int player = PlayerTwo;
     while (true)
@@ -117,7 +180,7 @@ void GameManager(std::vector<int> field)
         bool isError = false;
         player == PlayerOne ? player = PlayerTwo : player = PlayerOne;
         do{
-            isError = PlayersMove(field, allchips, player);
+            isError = PlayersMove(allchips, player);
         } while (isError);
 
         if (allchips <= 0)
@@ -137,6 +200,13 @@ void Settings(int& rows)
     ClearConsole();
     std::cout << "Input rows in game: ";
     Input(rows);
+    std::cout << "Do you want play with bot? (y/n): ";
+    char input;
+    Input(input);
+    if (input == 'y')
+        GameWithBot = true;
+    else if (input == 'n')
+        GameWithBot = false;
     ClearConsole();
 }
 
@@ -144,11 +214,12 @@ void Settings(int& rows)
 void Menu()
 {
     int rows = 3;
+    GameWithBot = true;
     while (true)
     {
         int input = -1;
         int Winner = -1;
-        std::vector<int> field = MakeField(rows);
+        field = MakeField(rows);
         std::cout << "1 - Start Game\n" <<
             "2 - Change Settings\n" <<
             "3 - Quit\n";
@@ -157,7 +228,7 @@ void Menu()
         switch (input)
         {
         case GameStart:
-            GameManager(field);
+            GameManager();
             break;
         case OpenSettings:
             Settings(rows);
