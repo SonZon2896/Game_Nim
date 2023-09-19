@@ -9,12 +9,23 @@ enum{
     PlayerTwo
 };
 
+void ClearConsole()
+{
+    system("cls");
+}
+
+/// @brief Input function
+/// @tparam T 
+/// @param input variable to input
 template <typename T>
 void Input(T& input)
 {
     std::cin >> input;
 }
 
+/// @brief Input to PlayersMove()
+/// @param row row in field
+/// @param chips number of chips in row
 void InputMove(int& row, int& chips)
 {
     Input(row);
@@ -23,7 +34,7 @@ void InputMove(int& row, int& chips)
 
 void PrintField(const std::vector<int> field)
 {
-    system("cls");
+    ClearConsole();
     for (int i = 0; i < field.size(); i++)
     {
         std::cout << i + 1 << ' ';
@@ -43,6 +54,9 @@ int SumChipsInField(const std::vector<int> field)
     return sum;
 }
 
+/// @brief make field by rows
+/// @param rows variable in Menu()
+/// @return 
 std::vector<int> MakeField(int rows)
 {
     std::vector<int> field(rows);
@@ -53,6 +67,11 @@ std::vector<int> MakeField(int rows)
     return field;
 }
 
+/// @brief 
+/// @param field gaming field
+/// @param allchips all chips in field
+/// @param player which player is moving
+/// @return return error(if player input error) - true, if not error - false
 bool PlayersMove(std::vector<int>& field, int& allchips, const int player)
 {
     int row, chips;
@@ -77,7 +96,7 @@ bool PlayersMove(std::vector<int>& field, int& allchips, const int player)
 
 void PrintWinner(const int Winner)
 {
-    system("cls");
+    ClearConsole();
     if (Winner == PlayerOne)
         std::cout << "First Player WINS!!!\n";
     else if (Winner == PlayerTwo)
@@ -86,6 +105,8 @@ void PrintWinner(const int Winner)
         std::cout << "No Winner\n\n";
 }
 
+/// @brief main game colculation
+/// @param field 
 void GameManager(std::vector<int> field)
 {
     int allchips = SumChipsInField(field);
@@ -109,14 +130,17 @@ void GameManager(std::vector<int> field)
     return;
 }
 
+/// @brief game settings
+/// @param rows rows in field
 void Settings(int& rows)
 {
-    system("cls");
+    ClearConsole();
     std::cout << "Input rows in game: ";
     Input(rows);
-    system("cls");
+    ClearConsole();
 }
 
+/// @brief main function
 void Menu()
 {
     int rows = 3;
@@ -129,7 +153,7 @@ void Menu()
             "2 - Change Settings\n" <<
             "3 - Quit\n";
         Input(input);
-        system("cls");
+        ClearConsole();
         switch (input)
         {
         case GameStart:
