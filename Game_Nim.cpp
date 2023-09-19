@@ -1,22 +1,69 @@
 #include <iostream>
+#include <vector>
 
 enum{
     GameStart = 1,
-    Settings,
+    OpenSettings,
+    Quit,
     PlayerOne,
     PlayerTwo
 };
 
-bool PlayersMove(int* field, int&allchips, const int rows, const int player)
+template <typename T>
+void Input(T& input)
+{
+    std::cin >> input;
+}
+
+void InputMove(int& row, int& chips)
+{
+    Input(row);
+    Input(chips);
+}
+
+void PrintField(const std::vector<int> field)
+{
+    system("cls");
+    for (int i = 0; i < field.size(); i++)
+    {
+        std::cout << i + 1 << ' ';
+        for (int j = 0; j < field[i]; j++)
+        {
+            std::cout << '*';
+        }
+        std::cout << std::endl;
+    }
+}
+
+int SumChipsInField(const std::vector<int> field)
+{
+    int sum = 0;
+    for (int i: field)
+        sum += i;
+    return sum;
+}
+
+std::vector<int> MakeField(int rows)
+{
+    std::vector<int> field(rows);
+    for (int i = 0; i < rows; i++)
+    {
+        field[i] = 3 + i;
+    }
+    return field;
+}
+
+bool PlayersMove(std::vector<int>& field, int& allchips, const int player)
 {
     int row, chips;
+    PrintField(field);
     if (player == PlayerOne)
         std::cout << "First Player Move (row, chips): ";
     else if (player == PlayerTwo)
         std::cout << "Second Player Move (row, chips):  ";
 
-    std::cin >> row >> chips;
-    if (row > rows || row <= 0)
+    InputMove(row, chips);
+    if (row > field.size() || row <= 0)
         return true;
     if (chips > field[--row] || chips <= 0)
         return true;
@@ -26,66 +73,27 @@ bool PlayersMove(int* field, int&allchips, const int rows, const int player)
     return false;
 }
 
-void PrintField(const int* field, const int rows)
+void PrintWinner(const int Winner)
 {
-    std::cout << '\n';
-    for (int i = 0; i < rows; i++)
-    {
-        std::cout << i + 1 << ' ';
-        for (int j = 0; j < field[i]; j++)
-        {
-            std::cout << '*';
-        }
-        std::cout << '\n';
-    }
+    system("cls");
+    if (Winner == PlayerOne)
+        std::cout << "First Player WINS!!!\n";
+    else if (Winner == PlayerTwo)
+        std::cout << "Second Player WINS!!!\n";
+    else
+        std::cout << "No Winner\n\n";
 }
 
-int main()
+void GameManager(std::vector<int> field)
 {
-    int input = 100;
-    int rows = 3;
-    while (true)
-    {
-        std::cout << "1 - Start Game\n2 - Change Settings\n";
-        std::cin >> input;
-
-        bool isQuit = false;
-        switch (input)
-        {
-        case GameStart:
-            isQuit = true;
-            break;
-        case Settings:
-            std::cout << "Print rows: ";
-            std::cin >> rows;
-            isQuit = true;
-            break;
-        default:
-            break;
-        }
-        if (isQuit)
-            break;
-    }
-    
-    
-
-    int allchips = 0;
-    int* field = new int[rows];
-    for (int i = 0; i < rows; i++)
-    {
-        field[i] = 3 + i;
-        allchips += field[i];
-    }
-
-    // Game is started
-    int Winner;
+    int allchips = SumChipsInField(field);
+    int Winner = -1;
     while (true)
     {
         bool isError = false;
-        PrintField(field, rows);
 
         do{
-            isError = PlayersMove(field, allchips, rows, PlayerOne);
+            isError = PlayersMove(field, allchips, PlayerOne);
         } while (isError);
 
         if (allchips <= 0)
@@ -93,10 +101,10 @@ int main()
             Winner = PlayerOne;
             break;
         }
-        PrintField(field, rows);
+        PrintField(field);
 
         do{
-            isError = PlayersMove(field, allchips, rows, PlayerTwo);
+            isError = PlayersMove(field, allchips, PlayerTwo);
         } while (isError);
 
         if (allchips <= 0)
@@ -105,16 +113,51 @@ int main()
             break;
         }
     }
+    PrintWinner(Winner);
+    return;
+}
 
-    if (Winner == PlayerOne)
-        std::cout << "First Player WINS!!!\n";
-    else if (Winner == PlayerTwo)
-        std::cout << "Second Player WINS!!!\n";
+void Settings(int& rows)
+{
+    system("cls");
+    std::cout << "Input rows in game: ";
+    Input(rows);
+    system("cls");
+}
 
-    std::cout << "Enter someting to quit: ";
-    int a;
-    std::cin >> a;
+void Menu()
+{
+    int rows = 3;
+    while (true)
+    {
+        int input = -1;
+        int Winner = -1;
+        std::vector<int> field = MakeField(rows);
+        std::cout << "1 - Start Game\n" <<
+            "2 - Change Settings\n" <<
+            "3 - Quit\n";
+        Input(input);
+        system("cls");
+        switch (input)
+        {
+        case GameStart:
+            GameManager(field);
+            break;
+        case OpenSettings:
+            Settings(rows);
+            break;
+        case Quit:
+            return;
+        default:
+            break;
+        }
+    }
+    return;
+}
 
-    delete[] field;
+int main()
+{
+    Menu();
+
     return 0;
 }
