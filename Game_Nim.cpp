@@ -216,7 +216,7 @@ void Settings(int& rows)
     ClearConsole();
     std::cout << "Input rows in game: ";
     Input(rows);
-    std::cout << "Do you want play with bot? (1/0): ";
+    std::cout << "Do you want play with bot? (" << Yes << '/' << No << "): ";
     int input;
     while (true)
     {
