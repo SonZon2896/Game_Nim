@@ -6,7 +6,10 @@ enum{
     OpenSettings,
     Quit,
     PlayerOne,
-    PlayerTwo
+    PlayerTwo,
+
+    Yes = 1,
+    No = 0,
 };
 
 static std::vector<int> prevfield;
@@ -21,10 +24,23 @@ void ClearConsole()
 /// @brief Input function
 /// @tparam T 
 /// @param input variable to input
-template <typename T>
-void Input(T& input)
+void Input(int& input)
 {
-    std::cin >> input;
+    while (true)
+    {
+        std::string Input;
+        std::cin >> Input;
+        try
+        {
+            input = std::stoi(Input);
+            return;  
+        }
+        catch(const std::exception& e)
+        {
+            //std::cerr << e.what() << '\n';
+            std::cout << "Try much more: ";
+        }
+    }
 }
 
 /// @brief Input to PlayersMove()
@@ -200,13 +216,24 @@ void Settings(int& rows)
     ClearConsole();
     std::cout << "Input rows in game: ";
     Input(rows);
-    std::cout << "Do you want play with bot? (y/n): ";
-    char input;
-    Input(input);
-    if (input == 'y')
-        GameWithBot = true;
-    else if (input == 'n')
-        GameWithBot = false;
+    std::cout << "Do you want play with bot? (1/0): ";
+    int input;
+    while (true)
+    {
+        Input(input);
+        if (input == Yes)
+        {
+            GameWithBot = true;
+            break;
+        }
+        else if (input == No)
+        {
+            GameWithBot = false;
+            break;
+        }
+        else
+            std::cout << "Try much more: ";
+    }
     ClearConsole();
 }
 
