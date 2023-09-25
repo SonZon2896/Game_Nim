@@ -26,20 +26,15 @@ void ClearConsole()
 /// @param input variable to input
 void Input(int& input)
 {
-    while (true)
+    std::string Input;
+    std::getline(std::cin, Input);
+    try
     {
-        std::string Input;
-        std::cin >> Input;
-        try
-        {
-            input = std::stoi(Input);
-            return;  
-        }
-        catch(const std::exception& e)
-        {
-            //std::cerr << e.what() << '\n';
-            std::cout << "Try much more: ";
-        }
+        input = std::stoi(Input);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << "CHELL VVEDI CHISLO" << std::endl;
     }
 }
 
@@ -47,9 +42,32 @@ void Input(int& input)
 /// @param row row in field
 /// @param chips number of chips in row
 void InputMove(int& row, int& chips)
+try
 {
-    Input(row);
-    Input(chips);
+    std::string Input;
+    std::getline(std::cin, Input);
+    std::string StrRow, StrChips;
+    int i;
+    for (i = 0; Input[i] != ' ' && i < Input.length(); i++)
+    {
+        StrRow += Input[i];
+    }
+    for (i++; Input[i] != ' ' && i < Input.length(); i++)
+    {
+        StrChips += Input[i];
+    }
+    if (Input.length() != StrRow.length() + StrChips.length() + 1)
+    {
+        row = chips = -1;
+        return;
+    }
+    row = std::stoi(StrRow);
+    chips = std::stoi(StrChips);
+    return;
+}
+catch(const std::exception& e)
+{
+    return;    
 }
 
 int SumChipsInField()
@@ -161,7 +179,7 @@ bool PlayersMove(int& allchips, const int player)
     }
     else
         InputMove(row, chips);
-    
+
     if (row > field.size() || row <= 0)
         return true;
     if (chips > field[--row] || chips <= 0)
