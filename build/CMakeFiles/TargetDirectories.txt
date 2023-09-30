@@ -1,0 +1,3 @@
+D:/lessons/c++/Game_Nim/build/CMakeFiles/GAME_NIM.dir
+D:/lessons/c++/Game_Nim/build/CMakeFiles/edit_cache.dir
+D:/lessons/c++/Game_Nim/build/CMakeFiles/rebuild_cache.dir

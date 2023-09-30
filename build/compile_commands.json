@@ -1,0 +1,8 @@
+[
+{
+  "directory": "D:/lessons/c++/Game_Nim/build",
+  "command": "C:\\mingw64\\bin\\g++.exe   -g -o CMakeFiles\\GAME_NIM.dir\\Game_Nim.cpp.obj -c D:\\lessons\\c++\\Game_Nim\\Game_Nim.cpp",
+  "file": "D:/lessons/c++/Game_Nim/Game_Nim.cpp",
+  "output": "CMakeFiles/GAME_NIM.dir/Game_Nim.cpp.obj"
+}
+]
